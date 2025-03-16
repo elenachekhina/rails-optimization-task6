@@ -1,0 +1,26 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run sitespeed.io (latest version)
+        uses: sitespeedio/github-action@main
+        with:
+          urls: https://ab2f-188-169-60-169.ngrok-free.app
+          budget: ./homeBudget.json
+          browsertime-chrome: true
+          video: true
+          visualMetrics: true
+
+      - name: Upload sitespeed.io results
+        uses: actions/upload-artifact@v3
+        with:
+          name: sitespeed-results
+          path: ./sitespeed-result

@@ -12,35 +12,44 @@
 
 ### Ваша находка №1
 До оптимизаций на главной странице:
-JavaScript Transfer Size with value 1.0 MB limit max 449.2 KB
+```JavaScript Transfer Size with value 1.0 MB limit max 449.2 KB```
+
+Vendor до оптимизаций:
+![img.png](before.png)
 
 devtool coverage показывает, что ~60% js не используется
 
 в vendor большую часть занимает moment (чуть меньше половины всего vendor)
+
 в ./yarn.lock видно, что chart.js зависит от moment, а также от chartjs-color, скорее всего проблема лишнего js как раз тут
 
-уберем moment из vendor: module.context.indexOf('moment') === -1
-JavaScript Transfer Size with value 753.3 KB limit max 449.2 KB
+уберем moment из vendor (module.context.indexOf('moment') === -1):
+```JavaScript Transfer Size with value 753.3 KB limit max 449.2 KB```
 
-уберем chartjs-color, который также есть в зависимотях chart.js: module.context.indexOf('chartjs-color') === -1
-JavaScript Transfer Size with value 727.5 KB limit max 449.2 KB
+уберем chartjs-color, который также есть в зависимотях chart.js (module.context.indexOf('chartjs-color') === -1):
+```JavaScript Transfer Size with value 727.5 KB limit max 449.2 KB```
 
-уберем chart.js, так как он не используется на главной странице: module.context.indexOf('chart') === -1
-JavaScript Transfer Size with value 452.2 KB limit max 449.2 KB
+уберем chart.js, так как он не используется на главной странице (module.context.indexOf('chart') === -1):
+```JavaScript Transfer Size with value 452.2 KB limit max 449.2 KB```
 
-у chartjs-color тоже есть зависимости, одна из них chartjs-color-string, уберем их: !/chartjs-color/.test(module.context)
-JavaScript Transfer Size with value 452.1 KB limit max 449.2 KB
-АААААА
+у chartjs-color тоже есть зависимости, одна из них chartjs-color-string, уберем их (!/chartjs-color/.test(module.context)):
+```JavaScript Transfer Size with value 452.1 KB limit max 449.2 KB``` АААААА
 
 уберем color-name (зависимость chartjs-color-string):
-JavaScript Transfer Size with value 448.0 KB limit max 449.2 KB (ура)
+```JavaScript Transfer Size with value 448.0 KB limit max 449.2 KB``` (ура)
 
-еще у chartjs-color есть зависимость color-convert, уберем ее: !/color-convert/.test(module.context)
-JavaScript Transfer Size with value 448.0 KB limit max 449.2 KB
+еще у chartjs-color есть зависимость color-convert, уберем ее (!/color-convert/.test(module.context)):
+```JavaScript Transfer Size with value 448.0 KB limit max 449.2 KB```
 
-Отрефакторим условие: !/chart|moment|color-name|color-convert/.test(module.context)
-JavaScript Transfer Size with value 448.0 KB limit max 449.2 KB
+Отрефакторим условие (!/chart|moment|color-name|color-convert/.test(module.context)):
+```JavaScript Transfer Size with value 448.0 KB limit max 449.2 KB```
+
+Vendor после оптимизаций:
+![img.png](after.png)
 
 ## Результаты
-В результате проделанной оптимизации удалось ускорить загрузку до ~1 секунды в development окружении.
-В local_production время ускорилось до ~0.2 секунд
+в результате оптимизации удалось уменьшить объем загружаемого js на главной странице с 1.0 MB до 448.0 KB и уложиться в бюджет 449.2 KB
+
+## Защита от регрессии производительности
+Для защиты от потери достигнутого прогресса при дальнейших изменениях программы был настроен CI
+
