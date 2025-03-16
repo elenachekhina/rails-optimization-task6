@@ -18,7 +18,9 @@ environment.plugins.append(
     name: 'vendor',
     minChunks: (module) => {
       // this assumes your vendor imports exist in the node_modules directory
-      return module.context && module.context.indexOf('node_modules') !== -1
+      return module.context &&
+        module.context.indexOf('node_modules') !== -1 &&
+        !/chart|moment|color-name|color-convert/.test(module.context)
     }
   })
 )
