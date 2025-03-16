@@ -10,17 +10,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Run sitespeed.io (latest version)
-        uses: sitespeedio/github-action@main
+      - name: Run sitespeed.io
+        uses: docker://sitespeedio/sitespeed.io:latest
         with:
-          urls: https://ab2f-188-169-60-169.ngrok-free.app
-          budget: ./homeBudget.json
-          browsertime-chrome: true
-          video: true
-          visualMetrics: true
+          args: https://ab2f-188-169-60-169.ngrok-free.app --budget.configPath ./homeBudget.json
 
       - name: Upload sitespeed.io results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sitespeed-results
           path: ./sitespeed-result
